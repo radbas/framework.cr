@@ -3,7 +3,7 @@ require "log"
 require "radbas-routing"
 require "radbas-container"
 
-module Radbas::Framework
+module Radbas
   VERSION = "0.1.0"
 
   alias Request = HTTP::Request
@@ -12,29 +12,28 @@ module Radbas::Framework
   alias ActionArgs = Hash(String, String)
   alias ActionLike = Proc(Context, Response) | Action
   alias MiddlewareLike = Proc(Context, HttpHandler, Response) | Middleware
-  alias RouteCollector = Routing::RouteCollector(ActionLike | Action.class, MiddlewareLike | Middleware.class)
-  alias Route = Routing::Route(ActionLike | Action.class, MiddlewareLike | Middleware.class)
+  alias RouteCollector = Routing::RouteCollector(ActionLike, MiddlewareLike)
+  alias Route = Routing::Route(ActionLike, MiddlewareLike)
   alias Router = Routing::Router(Route)
 
-  abstract class Middleware
+  module Middleware
     abstract def call(context : Context, handler : HttpHandler) : Response
   end
 
-  abstract class Action
+  module Action
     abstract def call(context : Context) : Response
   end
 
-  abstract class HttpHandler
+  module HttpHandler
     abstract def handle(context : Context) : Response
   end
 
-  abstract class ErrorHandler
+  module ErrorHandler
     abstract def handle(context : Context, exception : Exception) : Response
   end
 end
 
 require "./radbas-framework/ext/context"
-require "./radbas-framework/resolver"
 require "./radbas-framework/exceptions/*"
 require "./radbas-framework/middleware/*"
 require "./radbas-framework/routing/route"

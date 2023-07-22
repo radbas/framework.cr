@@ -1,4 +1,6 @@
-class Radbas::Framework::RoutingMiddleware < Radbas::Framework::Middleware
+class Radbas::RoutingMiddleware
+  include Middleware
+
   def initialize(@router : Router)
   end
 

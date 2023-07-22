@@ -1,13 +1,9 @@
-class Radbas::Framework::ActionMiddleware < Radbas::Framework::Middleware
-  def initialize(@action_resolver : Resolver(Action))
-  end
+class Radbas::ActionMiddleware
+  include Middleware
 
   def call(context : Context, handler : HttpHandler) : Response
-    raise "no route in context" unless context.route
+    raise MissingRouteException.new unless context.route
     action = context.route.as(Route).action
-    unless action.is_a?(ActionLike)
-      action = @action_resolver.call(action)
-    end
     action.call(context)
   end
 end

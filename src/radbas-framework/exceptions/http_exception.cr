@@ -1,4 +1,4 @@
-class Radbas::Framework::HttpException < Exception
+class Radbas::HttpException < Exception
   getter context, code
 
   def initialize(@context : Context, @code = 500)

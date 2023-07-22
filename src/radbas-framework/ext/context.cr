@@ -2,8 +2,8 @@
 class HTTP::Server::Context
   alias StoreTypes = String | Int32 | Int64 | Float64 | Bool
 
-  property route : Radbas::Framework::Route?
-  property args : Radbas::Framework::ActionArgs = {} of String => String
+  property route : Radbas::Route?
+  property args : Radbas::ActionArgs = {} of String => String
 
   @store = {} of String => StoreTypes
 

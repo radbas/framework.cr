@@ -1,4 +1,6 @@
-class Radbas::Framework::ErrorMiddleware < Radbas::Framework::Middleware
+class Radbas::ErrorMiddleware
+  include Middleware
+
   def initialize(@error_handler : ErrorHandler)
   end
 

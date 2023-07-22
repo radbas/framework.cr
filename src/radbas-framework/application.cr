@@ -1,26 +1,18 @@
-class Radbas::Framework::Application < Radbas::Framework::HttpHandler
+class Radbas::Application
   include HTTP::Handler
-  @@action_resolver = Resolver(Action).new { |a|
-    raise NotImplementedError.new("unable to resolve action #{a}")
-  }
-  @@middleware_resolver = Resolver(Middleware).new { |m|
-    raise NotImplementedError.new("unable to resolve middleware #{m}")
-  }
+  include HttpHandler
 
-  def initialize(
-    @action_resolver : Resolver(Action) = @@action_resolver,
-    @middleware_resolver : Resolver(Middleware) = @@middleware_resolver
-  )
+  def initialize
     @log = Log.for("radbas.app")
 
     @router = Router.new
     @routing_added = false
 
-    @middleware = [] of MiddlewareLike | Middleware.class
-    @added_middleware = [] of MiddlewareLike | Middleware.class
+    @middleware = [] of MiddlewareLike
+    @added_middleware = [] of MiddlewareLike
     @fixed_middleware = [
-      RouteMiddleware.new(@middleware_resolver),
-      ActionMiddleware.new(@action_resolver),
+      RouteMiddleware.new,
+      ActionMiddleware.new,
     ]
 
     @server_handler = [
@@ -56,10 +48,10 @@ class Radbas::Framework::Application < Radbas::Framework::HttpHandler
     self
   end
 
-  def add(middleware : MiddlewareLike | Middleware.class) : self
+  def add(middleware : MiddlewareLike) : self
     @added_middleware << middleware
     @middleware = [*@added_middleware, *@fixed_middleware]
-    if middleware.is_a?(RoutingMiddleware) || middleware.is_a?(RoutingMiddleware.class)
+    if middleware.is_a?(RoutingMiddleware)
       @log.warn { "routing already added" } if @routing_added
       @routing_added = true
     end
@@ -79,7 +71,7 @@ class Radbas::Framework::Application < Radbas::Framework::HttpHandler
 
   def handle(context : Context) : Response
     add_routing_middleware unless @routing_added
-    dispatcher = MiddlewareDispatcher.new(@middleware, @middleware_resolver)
+    dispatcher = MiddlewareDispatcher.new(@middleware)
     dispatcher.handle(context)
     # unless response == context.response
     #   raise "response mismatch"

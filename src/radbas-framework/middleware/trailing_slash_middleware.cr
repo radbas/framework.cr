@@ -1,4 +1,6 @@
-class Radbas::Framework::TrailingSlashMiddleware < Radbas::Framework::Middleware
+class Radbas::TrailingSlashMiddleware
+  include Middleware
+
   def initialize(@trailing_slash = false)
   end
 

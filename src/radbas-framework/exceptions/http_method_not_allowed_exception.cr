@@ -1,4 +1,4 @@
-class Radbas::Framework::HttpMethodNotAllowedException < Radbas::Framework::HttpException
+class Radbas::HttpMethodNotAllowedException < Radbas::HttpException
   getter methods
 
   def initialize(@context : Context, @methods : Array(String))

@@ -1,4 +1,6 @@
-class Radbas::Framework::SecureHeadersMiddleware < Radbas::Framework::Middleware
+class Radbas::SecureHeadersMiddleware
+  include Middleware
+
   def call(context : Context, handler : HttpHandler) : Response
     headers = context.response.headers
     headers["X-Content-Type-Options"] = "nosniff"

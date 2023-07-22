@@ -1,4 +1,4 @@
-class Radbas::Framework::HttpHeadHandler
+class Radbas::HttpHeadHandler
   include HTTP::Handler
 
   private class VoidOutput < IO

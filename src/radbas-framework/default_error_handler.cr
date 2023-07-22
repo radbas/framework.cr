@@ -1,4 +1,6 @@
-class Radbas::Framework::DefaultErrorHandler < Radbas::Framework::ErrorHandler
+class Radbas::DefaultErrorHandler
+  include ErrorHandler
+
   def initialize(
     @show_details = false,
     @log = Log.for("radbas.app")

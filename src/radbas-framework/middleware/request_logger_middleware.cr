@@ -1,4 +1,6 @@
-class Radbas::Framework::RequestLoggerMiddleware < Radbas::Framework::Middleware
+class Radbas::RequestLoggerMiddleware
+  include Middleware
+
   def initialize(@log = Log.for("radbas.server"))
   end
 

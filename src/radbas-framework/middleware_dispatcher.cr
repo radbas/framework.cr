@@ -1,9 +1,10 @@
-class Radbas::Framework::MiddlewareDispatcher < Radbas::Framework::HttpHandler
-  @middleware : Iterator(MiddlewareLike | Middleware.class)
+class Radbas::MiddlewareDispatcher
+  include HttpHandler
+
+  @middleware : Iterator(MiddlewareLike)
 
   def initialize(
-    middleware : Array(MiddlewareLike | Middleware.class),
-    @middleware_resolver : Resolver(Middleware),
+    middleware : Array(MiddlewareLike),
     @delegate : HttpHandler | Nil = nil
   )
     @middleware = middleware.each
@@ -15,9 +16,6 @@ class Radbas::Framework::MiddlewareDispatcher < Radbas::Framework::HttpHandler
       return @delegate.as(HttpHandler).handle(context) if @delegate
       raise "end of middleware stack reached"
     end
-    unless middleware.is_a?(MiddlewareLike)
-      middleware = @middleware_resolver.call(middleware.as(Middleware.class))
-    end
-    middleware.call(context, self)
+    middleware.as(MiddlewareLike).call(context, self)
   end
 end
