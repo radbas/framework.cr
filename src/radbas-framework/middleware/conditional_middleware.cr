@@ -1,4 +1,4 @@
-class Radbas::RouteMiddleware
+class Radbas::ConditionalMiddleware
   include Middleware
 
   def call(context : Context, handler : HttpHandler) : Response

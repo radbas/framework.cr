@@ -2,16 +2,16 @@ class Radbas::Application
   include HTTP::Handler
   include HttpHandler
 
-  def initialize
-    @log = Log.for("radbas.app")
-
+  def initialize(
+    @logger = Log.for("radbas.app")
+  )
     @router = Router.new
     @routing_added = false
 
     @middleware = [] of MiddlewareLike
     @added_middleware = [] of MiddlewareLike
     @fixed_middleware = [
-      RouteMiddleware.new,
+      ConditionalMiddleware.new,
       ActionMiddleware.new,
     ]
 
@@ -38,8 +38,8 @@ class Radbas::Application
 
   private def hello_world(context : Context) : Response
     payload = {application: "radbas", version: VERSION, message: "It works!"}
-    context.response.content_type = "text/plain"
-    context.response.write payload.to_s.to_slice
+    context.response.content_type = "application/json"
+    payload.to_json(context.response.output)
     context.response
   end
 
@@ -52,7 +52,7 @@ class Radbas::Application
     @added_middleware << middleware
     @middleware = [*@added_middleware, *@fixed_middleware]
     if middleware.is_a?(RoutingMiddleware)
-      @log.warn { "routing already added" } if @routing_added
+      @logger.warn { "routing already added" } if @routing_added
       @routing_added = true
     end
     self
@@ -64,7 +64,7 @@ class Radbas::Application
   end
 
   def add_error_middleware(show_details = false) : self
-    handler = DefaultErrorHandler.new(show_details)
+    handler = CommonErrorHandler.new(show_details)
     add ErrorMiddleware.new(handler)
     self
   end
@@ -84,8 +84,8 @@ class Radbas::Application
     self
   end
 
-  def bind(host : String, port : Int32) : self
-    server.bind_tcp(host, port)
+  def bind(host : String, port : Int32, reuse_port = false) : self
+    server.bind_tcp(host, port, reuse_port)
     self
   end
 
@@ -93,13 +93,13 @@ class Radbas::Application
     return if server.listening?
     if server.addresses.empty?
       bind = server.bind_tcp("0.0.0.0", 8080)
-      @log.warn { "no socket bound, using default #{bind}" }
+      @logger.warn { "no socket bound, using default #{bind}" }
     end
     server.each_address do |address|
-      @log.info { "server listening on #{address}" }
+      @logger.info { "server listening on #{address}" }
     end
     Signal::INT.trap do
-      @log.info { "server shutdown" }
+      @logger.info { "server shutdown" }
       close
       exit
     end

@@ -1,9 +1,9 @@
-class Radbas::DefaultErrorHandler
+class Radbas::CommonErrorHandler
   include ErrorHandler
 
   def initialize(
     @show_details = false,
-    @log = Log.for("radbas.app")
+    @logger = Log.for("radbas.app")
   )
   end
 
@@ -33,8 +33,8 @@ class Radbas::DefaultErrorHandler
     }
 
     response.status_code = status_code.to_i
-    response.content_type = "text/plain"
-    response.write payload.to_s.to_slice
+    response.content_type = "application/json"
+    payload.to_json(response.output)
     response
   end
 end

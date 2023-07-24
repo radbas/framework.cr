@@ -1,11 +1,15 @@
 # this extends the default http server context
 class HTTP::Server::Context
-  alias StoreTypes = String | Int32 | Int64 | Float64 | Bool
+  @store = JSON::Any.new({} of String => JSON::Any)
 
   property route : Radbas::Route?
-  property args : Radbas::ActionArgs = {} of String => String
+  property route_params = {} of String => String
+  property files = {} of String => File
+  property parsed_body : (HTTP::Params | JSON::Any)?
 
-  @store = {} of String => StoreTypes
+  getter query_params : HTTP::Params {
+    HTTP::Params.parse(@request.query || "")
+  }
 
   def []=(key, value)
     @store[key] = value

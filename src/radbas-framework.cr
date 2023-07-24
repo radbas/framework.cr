@@ -1,5 +1,7 @@
 require "http"
 require "log"
+require "uri"
+require "json"
 require "radbas-routing"
 require "radbas-container"
 
@@ -9,7 +11,6 @@ module Radbas
   alias Request = HTTP::Request
   alias Response = HTTP::Server::Response
   alias Context = HTTP::Server::Context
-  alias ActionArgs = Hash(String, String)
   alias ActionLike = Proc(Context, Response) | Action
   alias MiddlewareLike = Proc(Context, HttpHandler, Response) | Middleware
   alias RouteCollector = Routing::RouteCollector(ActionLike, MiddlewareLike)
@@ -35,10 +36,13 @@ end
 
 require "./radbas-framework/ext/context"
 require "./radbas-framework/exceptions/*"
-require "./radbas-framework/middleware/*"
+require "./radbas-framework/middleware/error_middleware"
+require "./radbas-framework/middleware/routing_middleware"
+require "./radbas-framework/middleware/conditional_middleware"
+require "./radbas-framework/middleware/action_middleware"
 require "./radbas-framework/routing/route"
 require "./radbas-framework/routing/route_collector"
 require "./radbas-framework/middleware_dispatcher"
 require "./radbas-framework/http_head_handler"
-require "./radbas-framework/default_error_handler"
+require "./radbas-framework/common_error_handler"
 require "./radbas-framework/application"
