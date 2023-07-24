@@ -5,7 +5,7 @@ class Radbas::MiddlewareDispatcher
 
   def initialize(
     middleware : Array(MiddlewareLike),
-    @delegate : HttpHandler | Nil = nil
+    @delegate : HttpHandler? = nil
   )
     @middleware = middleware.each
   end
@@ -14,7 +14,7 @@ class Radbas::MiddlewareDispatcher
     middleware = @middleware.next
     if middleware == Iterator.stop
       return @delegate.as(HttpHandler).handle(context) if @delegate
-      raise "end of middleware stack reached"
+      raise "end of middleware queue reached"
     end
     middleware.as(MiddlewareLike).call(context, self)
   end

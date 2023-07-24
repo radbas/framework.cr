@@ -13,9 +13,7 @@ module Radbas
   alias Context = HTTP::Server::Context
   alias ActionLike = Proc(Context, Response) | Action
   alias MiddlewareLike = Proc(Context, HttpHandler, Response) | Middleware
-  alias RouteCollector = Routing::RouteCollector(ActionLike, MiddlewareLike)
-  alias Route = Routing::Route(ActionLike, MiddlewareLike)
-  alias Router = Routing::Router(Route)
+  alias SocketHandlerLike = Proc(HTTP::WebSocket, Context, Response) | SocketHandler
 
   module Middleware
     abstract def call(context : Context, handler : HttpHandler) : Response
@@ -23,6 +21,10 @@ module Radbas
 
   module Action
     abstract def call(context : Context) : Response
+  end
+
+  module SocketHandler
+    abstract def call(socket : HTTP::WebSocket, context : Context) : Response
   end
 
   module HttpHandler
@@ -35,6 +37,7 @@ module Radbas
 end
 
 require "./radbas-framework/ext/context"
+require "./radbas-framework/exceptions/http_exception"
 require "./radbas-framework/exceptions/*"
 require "./radbas-framework/middleware/error_middleware"
 require "./radbas-framework/middleware/routing_middleware"
@@ -45,4 +48,5 @@ require "./radbas-framework/routing/route_collector"
 require "./radbas-framework/middleware_dispatcher"
 require "./radbas-framework/http_head_handler"
 require "./radbas-framework/common_error_handler"
+require "./radbas-framework/websocket_action"
 require "./radbas-framework/application"

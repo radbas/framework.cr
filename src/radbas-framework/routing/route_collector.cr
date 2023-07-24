@@ -1,6 +1,6 @@
-class Radbas::Routing::RouteCollector(A, M)
-  def initialize(@router : Router(Route(A, M)))
-    @middleware = [] of M
+class Radbas::RouteCollector
+  def initialize(@router : Routing::Router(Route))
+    @middleware = [] of MiddlewareLike
     @path = ""
   end
 
@@ -13,7 +13,7 @@ class Radbas::Routing::RouteCollector(A, M)
     self
   end
 
-  def group(path : String, middleware = [] of M, &) : self
+  def group(path : String, middleware = [] of MiddlewareLike, &) : self
     current_path = @path
     current_middleware = @middleware
     @path += path
@@ -24,16 +24,22 @@ class Radbas::Routing::RouteCollector(A, M)
     self
   end
 
-  private def map(method : String, path : String, action : A, middleware : Array(M), name : Symbol?) : self
+  private def map(method : String, path : String, action : ActionLike, middleware : Array(MiddlewareLike), name : Symbol?) : self
     route_middleware = [*@middleware, *middleware]
-    route = Route(A, M).new(action, route_middleware)
+    route = Route.new(action, route_middleware)
     @router.map([method], @path + path, route, name)
+    self
+  end
+
+  def ws(path : String, handler : SocketHandlerLike, middleware = [] of MiddlewareLike, name : Symbol? = nil) : self
+    action = WebsocketAction.new(handler)
+    map("WS", path, action, middleware, name)
     self
   end
 
   # define methods
   {% for method in %w(GET POST PUT PATCH DELETE OPTIONS) %}
-    def {{method.downcase.id}}(path : String, action : A, middleware = [] of M, name : Symbol? = nil) : self
+    def {{method.downcase.id}}(path : String, action : ActionLike, middleware = [] of MiddlewareLike, name : Symbol? = nil) : self
       map({{method}}, path, action, middleware, name)
     end
   {% end %}

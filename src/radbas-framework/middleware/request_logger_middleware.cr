@@ -1,7 +1,9 @@
 class Radbas::RequestLoggerMiddleware
   include Middleware
 
-  def initialize(@log = Log.for("radbas.server"))
+  def initialize(
+    @logger = Log.for("radbas.server")
+  )
   end
 
   def call(context : Context, handler : HttpHandler) : Response
@@ -20,7 +22,7 @@ class Radbas::RequestLoggerMiddleware
       end
     request_line = "\"#{request.method} #{request.resource} #{request.version}\""
     datetime = Time.local.to_s("%d/%b/%Y:%H:%M:%S %z")
-    @log.info {
+    @logger.info {
       "#{address} - [#{datetime}] #{request_line} #{response.status_code}"
     }
   end

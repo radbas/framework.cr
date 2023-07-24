@@ -1,1 +1,1 @@
-record Radbas::Routing::Route(A, M), action : A, middleware : Array(M)
+record Radbas::Route, action : ActionLike, middleware : Array(MiddlewareLike)

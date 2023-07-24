@@ -5,7 +5,7 @@ class Radbas::Application
   def initialize(
     @logger = Log.for("radbas.app")
   )
-    @router = Router.new
+    @router = Routing::Router(Route).new
     @routing_added = false
 
     @middleware = [] of MiddlewareLike
