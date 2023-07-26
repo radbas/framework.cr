@@ -4,19 +4,15 @@ class Radbas::RouteCollector
     @path = ""
   end
 
-  def collect(&)
-    with self yield
-  end
-
   def set_validator(name : Symbol, validator : Validator) : self
     @router.set_validator(name, validator)
     self
   end
 
-  def group(path : String, middleware = [] of MiddlewareLike, &) : self
+  def group(path : String = "", middleware = [] of MiddlewareLike, &) : self
     current_path = @path
     current_middleware = @middleware
-    @path += path
+    @path = "#{@path}#{path}"
     @middleware = [*@middleware, *middleware]
     with self yield
     @path = current_path
@@ -24,22 +20,36 @@ class Radbas::RouteCollector
     self
   end
 
-  private def map(method : String, path : String, action : ActionLike, middleware : Array(MiddlewareLike), name : Symbol?) : self
+  private def map(
+    method : String, path : String,
+    action : ActionLike,
+    middleware : Array(MiddlewareLike),
+    name : Symbol?
+  ) : self
     route_middleware = [*@middleware, *middleware]
     route = Route.new(action, route_middleware)
-    @router.map([method], @path + path, route, name)
+    @router.map([method], "#{@path}#{path}", route, name)
     self
   end
 
-  def ws(path : String, handler : SocketHandlerLike, middleware = [] of MiddlewareLike, name : Symbol? = nil) : self
+  def ws(
+    path : String,
+    handler : SocketHandlerLike,
+    middleware = [] of MiddlewareLike,
+    name : Symbol? = nil
+  ) : self
     action = WebsocketAction.new(handler)
     map("WS", path, action, middleware, name)
     self
   end
 
-  # define methods
   {% for method in %w(GET POST PUT PATCH DELETE OPTIONS) %}
-    def {{method.downcase.id}}(path : String, action : ActionLike, middleware = [] of MiddlewareLike, name : Symbol? = nil) : self
+    def {{method.downcase.id}}(
+      path : String,
+      action : ActionLike,
+      middleware = [] of MiddlewareLike,
+      name : Symbol? = nil
+    ) : self
       map({{method}}, path, action, middleware, name)
     end
   {% end %}

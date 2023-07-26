@@ -1,6 +1,7 @@
 class Radbas::BodyParsingMiddleware
   include Middleware
 
+  # TODO: data limits
   def call(context : Context, handler : HttpHandler) : Response
     request = context.request
     content_type = request.headers["Content-Type"]?

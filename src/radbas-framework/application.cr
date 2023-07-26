@@ -6,14 +6,12 @@ class Radbas::Application
     @logger = Log.for("radbas.app")
   )
     @router = Routing::Router(Route).new
-    @routing_added = false
 
-    @middleware = [] of MiddlewareLike
-    @added_middleware = [] of MiddlewareLike
-    @fixed_middleware = [
-      ConditionalMiddleware.new,
+    @middleware = [
+      RoutingMiddleware.new(@router),
       ActionMiddleware.new,
-    ]
+    ] of MiddlewareLike
+    @middleware_insert = -3
 
     @server_handler = [
       HttpHeadHandler.new,
@@ -26,11 +24,6 @@ class Radbas::Application
     @server_handler << self
     HTTP::Server.new(@server_handler)
   }
-
-  def call(context : HTTP::Server::Context)
-    handle(context)
-    @next.as(HTTP::Handler).call(context) if @next
-  end
 
   getter routes : RouteCollector {
     RouteCollector.new(@router)
@@ -49,34 +42,36 @@ class Radbas::Application
   end
 
   def add(middleware : MiddlewareLike) : self
-    @added_middleware << middleware
-    @middleware = [*@added_middleware, *@fixed_middleware]
-    if middleware.is_a?(RoutingMiddleware)
-      @logger.warn { "routing already added" } if @routing_added
-      @routing_added = true
+    @middleware.insert(@middleware_insert, middleware)
+    self
+  end
+
+  def add_routing_middleware : RoutingMiddleware
+    if @middleware_insert == -3
+      @middleware_insert -= 1
+      return @middleware[@middleware_insert].as(RoutingMiddleware)
     end
-    self
+    @logger.warn { "routing already added" }
+    routing_middleware = RoutingMiddleware.new(@router)
+    add routing_middleware
+    routing_middleware
   end
 
-  def add_routing_middleware : self
-    add RoutingMiddleware.new(@router)
-    self
+  def add_error_middleware(show_details = false) : ErrorMiddleware
+    error_handler = CommonErrorHandler.new(show_details)
+    error_middleware = ErrorMiddleware.new(error_handler)
+    add error_middleware
+    error_middleware
   end
 
-  def add_error_middleware(show_details = false) : self
-    handler = CommonErrorHandler.new(show_details)
-    add ErrorMiddleware.new(handler)
-    self
+  def call(context : HTTP::Server::Context)
+    handle(context)
+    @next.as(HTTP::Handler).call(context) if @next
   end
 
   def handle(context : Context) : Response
-    add_routing_middleware unless @routing_added
     dispatcher = MiddlewareDispatcher.new(@middleware)
     dispatcher.handle(context)
-    # unless response == context.response
-    #   raise "response mismatch"
-    # end
-    # response
   end
 
   def bind(uri : String) : self
@@ -98,12 +93,15 @@ class Radbas::Application
     server.each_address do |address|
       @logger.info { "server listening on #{address}" }
     end
-    Signal::INT.trap do
-      @logger.info { "server shutdown" }
-      close
-      exit
-    end
+    Signal::INT.trap &->shutdown(Signal)
+    Signal::TERM.trap &->shutdown(Signal)
     server.listen
+  end
+
+  private def shutdown(signal : Signal)
+    @logger.info { "server shutdown" }
+    close
+    exit
   end
 
   def close

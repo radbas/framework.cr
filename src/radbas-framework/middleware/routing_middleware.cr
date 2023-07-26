@@ -1,19 +1,19 @@
 class Radbas::RoutingMiddleware
   include Middleware
 
-  NO_ALLOW_METHODS = ["GET", "HEAD", "WS"]
-
   def initialize(@router : Routing::Router(Route))
   end
 
   def call(context : Context, handler : HttpHandler) : Response
     request_method = context.request.method
-    if request_method == "GET" && websocket_upgrade_request?(context.request)
+    if request_method == "HEAD"
+      request_method = "GET"
+    elsif request_method == "GET" && websocket_upgrade_request?(context.request)
       request_method = "WS"
     end
     match_result = @router.match(request_method, context.request.path)
     unless match_result.match?
-      unless match_result.methods.empty? || NO_ALLOW_METHODS.includes?(request_method)
+      unless match_result.methods.empty? || {"GET", "HEAD", "WS"}.includes?(request_method)
         match_result.methods.delete("WS")
         raise HttpMethodNotAllowedException.new(context, match_result.methods)
       end
