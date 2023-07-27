@@ -1,13 +1,13 @@
 # this extends the default http server context
 class HTTP::Server::Context
-  @store = JSON::Any.new({} of String => JSON::Any)
+  @store = {} of String => JSON::Any::Type
 
   property route : Radbas::Route?
-  property route_params = {} of String => String
+  property params = {} of String => String
   property files = {} of String => File
-  property parsed_body : (HTTP::Params | JSON::Any)?
+  property body : (HTTP::Params | JSON::Any)?
 
-  getter query_params : HTTP::Params {
+  getter query : HTTP::Params {
     HTTP::Params.parse(@request.query || "")
   }
 

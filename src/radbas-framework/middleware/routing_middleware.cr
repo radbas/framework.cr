@@ -20,7 +20,7 @@ class Radbas::RoutingMiddleware
       raise HttpNotFoundException.new(context)
     end
     context.route = match_result.handler.as(Route)
-    context.route_params = match_result.params
+    context.params = match_result.params
     handler.handle(context)
   end
 
