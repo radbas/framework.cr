@@ -5,10 +5,10 @@ class HTTP::Server::Context
   property route : Radbas::Route?
   property params = {} of String => String
   property files = {} of String => File
-  property body : (HTTP::Params | JSON::Any)?
+  property body : (URI::Params | JSON::Any)?
 
-  getter query : HTTP::Params {
-    HTTP::Params.parse(@request.query || "")
+  getter query : URI::Params {
+    URI::Params.parse(@request.query || "")
   }
 
   def []=(key, value)

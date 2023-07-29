@@ -1,5 +1,5 @@
 class Radbas::HttpNotFoundException < Radbas::HttpException
   def initialize(@context : Context)
-    super(context, 404)
+    super(context, HTTP::Status::NOT_FOUND)
   end
 end

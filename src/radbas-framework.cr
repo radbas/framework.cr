@@ -1,7 +1,4 @@
 require "http"
-require "log"
-require "uri"
-require "json"
 require "radbas-routing"
 require "radbas-container"
 

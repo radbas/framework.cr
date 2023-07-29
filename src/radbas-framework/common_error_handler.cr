@@ -14,25 +14,19 @@ class Radbas::CommonErrorHandler
     if context.request.method == "OPTIONS"
       status_code = HTTP::Status::OK.code
     elsif exception.is_a?(HttpException)
-      status_code = exception.code
+      status_code = exception.status.code
       if exception.is_a?(HttpMethodNotAllowedException)
         response.headers["Allow"] = exception.methods.join(",")
       end
     end
 
-    if @show_details
-      details = exception.inspect_with_backtrace.strip.split("\n").map &.strip
-    else
-      details = [] of String
-    end
-
     payload = {
       status:  status_code,
-      message: exception.message.to_s,
-      details: details,
+      message: exception.message,
+      details: @show_details ? exception.inspect_with_backtrace.strip.split("\n").map &.strip : nil,
     }
 
-    response.status_code = status_code.to_i
+    response.status_code = status_code
     response.content_type = "application/json"
     payload.to_json(response.output)
     response

@@ -13,14 +13,14 @@ class Radbas::BodyParsingMiddleware
       when "application/x-www-form-urlencoded"
         context.body = URI::Params.parse(request_body.as(IO).gets_to_end)
       when "multipart/form-data"
-        context.body = HTTP::Params.new
+        context.body = URI::Params.new
         HTTP::FormData.parse(request) do |part|
           if part.filename
             context.files[part.name] = File.tempfile("upload") do |file|
               IO.copy(part.body, file)
             end
           else
-            context.body.as(HTTP::Params).add(part.name, part.body.gets_to_end)
+            context.body.as(URI::Params).add(part.name, part.body.gets_to_end)
           end
         end
       end
