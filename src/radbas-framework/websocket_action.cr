@@ -15,8 +15,9 @@ class Radbas::WebsocketAction
       return response
     end
 
-    key = context.request.headers["Sec-WebSocket-Key"]?
-    raise HttpBadRequestException.new(context) unless key
+    unless key = context.request.headers["Sec-WebSocket-Key"]?
+      raise HttpBadRequestException.new(context, "missing socket key")
+    end
 
     accept_code = WebSocket::Protocol.key_challenge(key)
 

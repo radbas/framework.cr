@@ -17,7 +17,7 @@ class Radbas::Application
       HttpHeadHandler.new,
     ] of HTTP::Handler
 
-    routes.get("/", ->hello_world(Context))
+    routes.get("/", ->index_action(Context))
   end
 
   private getter server : HTTP::Server {
@@ -29,7 +29,7 @@ class Radbas::Application
     RouteCollector.new(@router)
   }
 
-  private def hello_world(context : Context) : Response
+  private def index_action(context : Context) : Response
     payload = {application: "radbas", version: VERSION, message: "It works!"}
     context.response.content_type = "application/json"
     payload.to_json(context.response.output)
@@ -48,7 +48,7 @@ class Radbas::Application
 
   def add_routing_middleware : RoutingMiddleware
     if @middleware_insert == -3
-      @middleware_insert -= 1
+      @middleware_insert += 1
       return @middleware[@middleware_insert].as(RoutingMiddleware)
     end
     @logger.warn { "routing already added" }
