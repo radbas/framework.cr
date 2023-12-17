@@ -1,4 +1,4 @@
-class Radbas::WebsocketAction
+class Radbas::WebSocketAction
   include Action
   private alias WebSocket = HTTP::WebSocket
 

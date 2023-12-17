@@ -38,8 +38,19 @@ class Radbas::RouteCollector
     middleware = [] of MiddlewareLike,
     name : Symbol? = nil
   ) : self
-    action = WebsocketAction.new(handler)
+    action = WebSocketAction.new(handler)
     map("WS", path, action, middleware, name)
+    self
+  end
+
+  def sse(
+    path : String,
+    handler : StreamHandlerLike,
+    middleware = [] of MiddlewareLike,
+    name : Symbol? = nil
+  ) : self
+    action = ServerSentEvents::Action.new(handler)
+    map("GET", path, action, middleware, name)
     self
   end
 
