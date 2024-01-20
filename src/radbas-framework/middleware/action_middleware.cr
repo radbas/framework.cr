@@ -1,7 +1,7 @@
 class Radbas::ActionMiddleware
   include Middleware
 
-  def call(context : Context, handler : HttpHandler) : Response
+  def call(context : Context, handler : HttpHandler) : Nil
     raise MissingRouteException.new unless context.route
     route = context.route.as(Route)
     middleware = route.middleware

@@ -5,14 +5,14 @@ class Radbas::WebSocketAction
   def initialize(@socket_handler : SocketHandlerLike)
   end
 
-  def call(context : Context) : Response
+  def call(context : Context) : Nil
     response = context.response
 
     version = context.request.headers["Sec-WebSocket-Version"]?
     unless version == WebSocket::Protocol::VERSION
       response.status = :upgrade_required
       response.headers["Sec-WebSocket-Version"] = WebSocket::Protocol::VERSION
-      return response
+      return
     end
 
     unless key = context.request.headers["Sec-WebSocket-Key"]?
@@ -30,6 +30,5 @@ class Radbas::WebSocketAction
       @socket_handler.call(socket, context)
       socket.run
     end
-    response
   end
 end

@@ -7,7 +7,7 @@ class Radbas::CommonErrorHandler
   )
   end
 
-  def handle(context : Context, exception : Exception) : Response
+  def handle(exception : Exception, context : Context) : Nil
     response = context.response
 
     status_code : Int32 = HTTP::Status::INTERNAL_SERVER_ERROR.code
@@ -29,6 +29,5 @@ class Radbas::CommonErrorHandler
     response.status_code = status_code
     response.content_type = "application/json"
     payload.to_json(response.output)
-    response
   end
 end

@@ -4,7 +4,7 @@ class Radbas::RoutingMiddleware
   def initialize(@router : Routing::Router(Route))
   end
 
-  def call(context : Context, handler : HttpHandler) : Response
+  def call(context : Context, handler : HttpHandler) : Nil
     request_method = context.request.method
     if request_method == "HEAD"
       request_method = "GET"

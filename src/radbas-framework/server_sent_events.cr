@@ -69,7 +69,7 @@ module Radbas::ServerSentEvents
     def initialize(@stream_handler : StreamHandlerLike)
     end
 
-    def call(context : Context) : Response
+    def call(context : Context) : Nil
       response = context.response
       response.content_type = "text/event-stream"
       response.headers["Cache-Control"] = "no-cache"
@@ -78,7 +78,6 @@ module Radbas::ServerSentEvents
         @stream_handler.call(stream, context)
         stream.start
       end
-      response
     end
   end
 end

@@ -4,13 +4,13 @@ struct Radbas::MiddlewareDispatcher
   @middleware : Iterator(MiddlewareLike)
 
   def initialize(
-    middleware : Array(MiddlewareLike),
-    @delegate : Proc(Context, Response)? = nil
+    middleware : Iterable(MiddlewareLike),
+    @delegate : Proc(Context, Nil)? = nil
   )
     @middleware = middleware.each
   end
 
-  def handle(context : Context) : Response
+  def handle(context : Context) : Nil
     middleware = @middleware.next
     if middleware == Iterator.stop
       return @delegate.as(Proc).call(context) if @delegate

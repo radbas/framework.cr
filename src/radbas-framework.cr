@@ -8,17 +8,17 @@ module Radbas
   alias Request = HTTP::Request
   alias Response = HTTP::Server::Response
   alias Context = HTTP::Server::Context
-  alias ActionLike = Proc(Context, Response) | Action
-  alias MiddlewareLike = Proc(Context, HttpHandler, Response) | Middleware
+  alias ActionLike = Proc(Context, Nil) | Action
+  alias MiddlewareLike = Proc(Context, HttpHandler, Nil) | Middleware
   alias SocketHandlerLike = Proc(HTTP::WebSocket, Context, Nil) | SocketHandler
   alias StreamHandlerLike = Proc(ServerSentEvents::Stream, Context, Nil) | StreamHandler
 
   module Middleware
-    abstract def call(context : Context, handler : HttpHandler) : Response
+    abstract def call(context : Context, handler : HttpHandler) : Nil
   end
 
   module Action
-    abstract def call(context : Context) : Response
+    abstract def call(context : Context) : Nil
   end
 
   module SocketHandler
@@ -30,11 +30,11 @@ module Radbas
   end
 
   module HttpHandler
-    abstract def handle(context : Context) : Response
+    abstract def handle(context : Context) : Nil
   end
 
   module ErrorHandler
-    abstract def handle(context : Context, exception : Exception) : Response
+    abstract def handle(exception : Exception, context : Context) : Nil
   end
 end
 

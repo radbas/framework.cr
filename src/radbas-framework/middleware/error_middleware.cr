@@ -4,9 +4,9 @@ class Radbas::ErrorMiddleware
   def initialize(@error_handler : ErrorHandler)
   end
 
-  def call(context : Context, handler : HttpHandler) : Response
+  def call(context : Context, handler : HttpHandler) : Nil
     handler.handle(context)
   rescue exception
-    @error_handler.handle(context, exception)
+    @error_handler.handle(exception, context)
   end
 end

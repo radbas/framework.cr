@@ -4,13 +4,13 @@ class Radbas::TrailingSlashMiddleware
   def initialize(@trailing_slash = false)
   end
 
-  def call(context : Context, handler : HttpHandler) : Response
+  def call(context : Context, handler : HttpHandler) : Nil
     path = context.request.path
     unless path == "/"
       new_path = "#{path.rstrip("/")}#{(@trailing_slash ? "/" : "")}"
       unless new_path == path
         context.response.redirect(new_path, HTTP::Status::MOVED_PERMANENTLY)
-        return context.response
+        return
       end
     end
     handler.handle(context)

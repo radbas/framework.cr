@@ -1,7 +1,7 @@
 class Radbas::SecureHeadersMiddleware
   include Middleware
 
-  def call(context : Context, handler : HttpHandler) : Response
+  def call(context : Context, handler : HttpHandler) : Nil
     headers = context.response.headers
     headers["X-Content-Type-Options"] = "nosniff"
     headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"

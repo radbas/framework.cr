@@ -6,7 +6,7 @@ class Radbas::RequestLoggerMiddleware
   )
   end
 
-  def call(context : Context, handler : HttpHandler) : Response
+  def call(context : Context, handler : HttpHandler) : Nil
     handler.handle(context)
   ensure
     request = context.request

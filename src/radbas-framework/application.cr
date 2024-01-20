@@ -29,11 +29,10 @@ class Radbas::Application
     RouteCollector.new(@router)
   }
 
-  private def index_action(context : Context) : Response
+  private def index_action(context : Context) : Nil
     payload = {application: "radbas", version: VERSION, message: "It works!"}
     context.response.content_type = "application/json"
     payload.to_json(context.response.output)
-    context.response
   end
 
   def add(http_handler : HTTP::Handler) : self
@@ -64,12 +63,12 @@ class Radbas::Application
     error_middleware
   end
 
-  def call(context : HTTP::Server::Context)
+  def call(context : HTTP::Server::Context) : Nil
     handle(context)
     @next.as(HTTP::Handler).call(context) if @next
   end
 
-  def handle(context : Context) : Response
+  def handle(context : Context) : Nil
     dispatcher = MiddlewareDispatcher.new(@middleware)
     dispatcher.handle(context)
   end
@@ -84,7 +83,7 @@ class Radbas::Application
     self
   end
 
-  def listen
+  def listen : Nil
     return if server.listening?
     if server.addresses.empty?
       bind = server.bind_tcp("0.0.0.0", 8080)
@@ -98,13 +97,13 @@ class Radbas::Application
     server.listen
   end
 
-  private def shutdown(signal : Signal)
+  private def shutdown(signal : Signal) : Nil
     @logger.info { "server shutdown" }
     close
     exit
   end
 
-  def close
+  def close : Nil
     server.close unless server.closed?
   end
 end
