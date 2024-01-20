@@ -13,16 +13,11 @@ class Radbas::Application
     ] of MiddlewareLike
     @middleware_insert = -3
 
-    @server_handler = [
-      HttpHeadHandler.new,
-    ] of HTTP::Handler
-
     routes.get("/", ->index_action(Context))
   end
 
   private getter server : HTTP::Server {
-    @server_handler << self
-    HTTP::Server.new(@server_handler)
+    HTTP::Server.new([HttpHeadHandler.new, self])
   }
 
   getter routes : RouteCollector {
@@ -36,7 +31,10 @@ class Radbas::Application
   end
 
   def add(http_handler : HTTP::Handler) : self
-    @server_handler << http_handler
+    add ->(context : Context, handler : HttpHandler) do
+      http_handler.next = ->handler.handle(Context)
+      http_handler.call(context)
+    end
     self
   end
 
@@ -64,13 +62,11 @@ class Radbas::Application
   end
 
   def call(context : HTTP::Server::Context) : Nil
-    handle(context)
-    @next.as(HTTP::Handler).call(context) if @next
+    MiddlewareDispatcher.new(@middleware, ->call_next(Context)).handle(context)
   end
 
   def handle(context : Context) : Nil
-    dispatcher = MiddlewareDispatcher.new(@middleware)
-    dispatcher.handle(context)
+    MiddlewareDispatcher.new(@middleware).handle(context)
   end
 
   def bind(uri : String) : self
