@@ -1,7 +1,6 @@
 require "http"
 require "json"
 require "radbas-routing"
-require "radbas-container"
 
 module Radbas
   VERSION = "0.2.0"
