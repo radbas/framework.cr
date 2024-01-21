@@ -14,7 +14,7 @@ class Radbas::RouteCollector
     current_middleware = @middleware
     @path = "#{@path}#{path}"
     @middleware = [*@middleware, *middleware]
-    yield self
+    with self yield self
     @path = current_path
     @middleware = current_middleware
     self
