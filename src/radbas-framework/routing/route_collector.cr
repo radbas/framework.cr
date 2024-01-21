@@ -14,14 +14,15 @@ class Radbas::RouteCollector
     current_middleware = @middleware
     @path = "#{@path}#{path}"
     @middleware = [*@middleware, *middleware]
-    with self yield
+    yield self
     @path = current_path
     @middleware = current_middleware
     self
   end
 
   private def map(
-    method : String, path : String,
+    method : String,
+    path : String,
     action : ActionLike,
     middleware : Array(MiddlewareLike),
     name : Symbol?
@@ -40,7 +41,6 @@ class Radbas::RouteCollector
   ) : self
     action = WebSocketAction.new(handler)
     map("WS", path, action, middleware, name)
-    self
   end
 
   def sse(
@@ -51,7 +51,6 @@ class Radbas::RouteCollector
   ) : self
     action = ServerSentEvents::Action.new(handler)
     map("GET", path, action, middleware, name)
-    self
   end
 
   {% for method in %w(GET POST PUT PATCH DELETE OPTIONS) %}
