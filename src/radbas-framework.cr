@@ -14,27 +14,27 @@ module Radbas
   alias StreamHandlerLike = Proc(ServerSentEvents::Stream, Context, Nil) | StreamHandler
 
   module Middleware
-    abstract def call(context : Context, handler : HttpHandler) : Nil
+    abstract def call(context : Context, handler : HttpHandler)
   end
 
   module Action
-    abstract def call(context : Context) : Nil
+    abstract def call(context : Context)
   end
 
   module SocketHandler
-    abstract def call(socket : HTTP::WebSocket, context : Context) : Nil
+    abstract def call(socket : HTTP::WebSocket, context : Context)
   end
 
   module StreamHandler
-    abstract def call(stream : ServerSentEvents::Stream, context : Context) : Nil
+    abstract def call(stream : ServerSentEvents::Stream, context : Context)
   end
 
   module HttpHandler
-    abstract def handle(context : Context) : Nil
+    abstract def handle(context : Context)
   end
 
   module ErrorHandler
-    abstract def handle(exception : Exception, context : Context) : Nil
+    abstract def handle(exception : Exception, context : Context)
   end
 end
 
