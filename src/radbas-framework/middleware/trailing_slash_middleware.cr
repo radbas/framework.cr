@@ -4,7 +4,7 @@ class Radbas::TrailingSlashMiddleware
   def initialize(@trailing_slash = false)
   end
 
-  def call(context : Context, handler : HttpHandler) : Nil
+  def call(context : Context, delegate : ActionLike) : Nil
     path = context.request.path
     unless path == "/"
       new_path = "#{path.rstrip("/")}#{(@trailing_slash ? "/" : "")}"
@@ -13,6 +13,6 @@ class Radbas::TrailingSlashMiddleware
         return
       end
     end
-    handler.handle(context)
+    delegate.call(context)
   end
 end

@@ -8,8 +8,8 @@ describe Radbas do
       output = String::Builder.new
       response = HTTP::Server::Response.new output
       ctx = HTTP::Server::Context.new request, response
-      app.handle ctx
-      response.status_code.should eq 200
+      app.call ctx
+      response.status_code.should eq 404
       # output.to_s.should eq ""
     end
   end

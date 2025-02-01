@@ -4,7 +4,7 @@ class Radbas::RoutingMiddleware
   def initialize(@router : Routing::Router(Route))
   end
 
-  def call(context : Context, handler : HttpHandler) : Nil
+  def call(context : Context, delegate : ActionLike) : Nil
     request_method = context.request.method
     if request_method == "HEAD"
       request_method = "GET"
@@ -21,7 +21,7 @@ class Radbas::RoutingMiddleware
     end
     context.route = match_result.handler.as(Route)
     context.params = match_result.params
-    handler.handle(context)
+    delegate.call(context)
   end
 
   private def websocket_upgrade_request?(request : Request) : Bool

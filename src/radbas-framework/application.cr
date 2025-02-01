@@ -1,19 +1,12 @@
 class Radbas::Application
   include HTTP::Handler
-  include HttpHandler
+  include MiddlewareHandler
 
   def initialize(
     @logger = Log.for("radbas.app"),
   )
     @router = Routing::Router(Route).new
-
-    @middleware = [
-      RoutingMiddleware.new(@router),
-      ActionMiddleware.new,
-    ] of MiddlewareLike
-    @middleware_insert = -3
-
-    routes.get("/", ->index_action(Context))
+    @middleware = [] of MiddlewareLike
   end
 
   private getter server : HTTP::Server {
@@ -24,49 +17,52 @@ class Radbas::Application
     RouteCollector.new(@router)
   }
 
-  private def index_action(context : Context) : Nil
-    payload = {application: "radbas", version: VERSION, message: "It works!"}
-    context.response.content_type = "application/json"
-    payload.to_json(context.response.output)
-  end
-
-  def add(http_handler : HTTP::Handler) : self
-    add ->(context : Context, handler : HttpHandler) do
-      http_handler.next = ->handler.handle(Context)
-      http_handler.call(context)
+  def use(http_handler : HTTP::Handler) : self
+    use ->(ctx : Context, delegate : ActionLike) do
+      http_handler.next = delegate
+      http_handler.call(ctx)
     end
     self
   end
 
-  def add(middleware : MiddlewareLike) : self
-    @middleware.insert(@middleware_insert, middleware)
+  def use(middleware : MiddlewareLike) : self
+    @middleware << middleware
     self
   end
 
-  def add_routing_middleware : RoutingMiddleware
-    if @middleware_insert == -3
-      @middleware_insert += 1
-      return @middleware[@middleware_insert].as(RoutingMiddleware)
-    end
-    @logger.warn { "routing already added" }
-    routing_middleware = RoutingMiddleware.new(@router)
-    add routing_middleware
-    routing_middleware
+  def use_logging_middleware : LoggingMiddleware
+    logging_middleware = LoggingMiddleware.new(@logger)
+    use logging_middleware
+    logging_middleware
   end
 
-  def add_error_middleware(show_details = false) : ErrorMiddleware
-    error_handler = CommonErrorHandler.new(show_details)
+  def use_error_middleware(show_details = false) : ErrorMiddleware
+    error_handler = CommonErrorHandler.new(show_details, @logger)
     error_middleware = ErrorMiddleware.new(error_handler)
-    add error_middleware
+    use error_middleware
     error_middleware
   end
 
-  def call(context : HTTP::Server::Context) : Nil
-    MiddlewareDispatcher.new(@middleware, ->call_next(Context)).handle(context)
+  def use_routing_middleware : RoutingMiddleware
+    routing_middleware = RoutingMiddleware.new(@router)
+    use routing_middleware
+    routing_middleware
   end
 
-  def handle(context : Context) : Nil
-    MiddlewareDispatcher.new(@middleware).handle(context)
+  def use_endpoint_middleware : EndpointMiddleware
+    endpoint_middleware = EndpointMiddleware.new
+    use endpoint_middleware
+    endpoint_middleware
+  end
+
+  private def next_handler(context : Context, delegate : ActionLike)
+    call_next(context)
+  end
+
+  def call(context : HTTP::Server::Context) : Nil
+    # TODO: cache middleware stack
+    middleware = [*@middleware, ->next_handler(Context, ActionLike)]
+    handle(context, middleware, 0)
   end
 
   def bind(uri : String) : self

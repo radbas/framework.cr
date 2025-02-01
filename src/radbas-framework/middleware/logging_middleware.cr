@@ -1,4 +1,4 @@
-class Radbas::RequestLoggerMiddleware
+class Radbas::LoggingMiddleware
   include Middleware
 
   def initialize(
@@ -6,8 +6,8 @@ class Radbas::RequestLoggerMiddleware
   )
   end
 
-  def call(context : Context, handler : HttpHandler) : Nil
-    handler.handle(context)
+  def call(context : Context, delegate : ActionLike) : Nil
+    delegate.call(context)
   ensure
     request = context.request
     response = context.response

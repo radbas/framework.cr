@@ -1,11 +1,11 @@
 class Radbas::PerformanceMiddleware
   include Middleware
 
-  def call(context : Context, handler : HttpHandler) : Nil
+  def call(context : Context, delegate : ActionLike) : Nil
     start_time = Time.monotonic
     start_bytes = GC.stats.total_bytes
     begin
-      handler.handle(context)
+      delegate.call(context)
     ensure
       elapsed = Time.monotonic - start_time
       bytes = GC.stats.total_bytes - start_bytes

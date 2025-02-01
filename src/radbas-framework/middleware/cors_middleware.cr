@@ -1,8 +1,8 @@
 class Radbas::CorsMiddleware
   include Middleware
 
-  def call(context : Context, handler : HttpHandler) : Nil
+  def call(context : Context, delegate : ActionLike) : Nil
     context.response.headers["Access-Control-Allow-Origin"] = "*"
-    handler.handle(context)
+    delegate.call(context)
   end
 end
