@@ -3,7 +3,7 @@ class Radbas::CommonErrorHandler
 
   def initialize(
     @show_details = false,
-    @logger = Log.for("radbas.app")
+    @logger = Log.for("radbas.app"),
   )
   end
 

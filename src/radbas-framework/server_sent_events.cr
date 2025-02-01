@@ -41,7 +41,7 @@ module Radbas::ServerSentEvents
       data : Iterable(String),
       event : String? = nil,
       id : String? = nil,
-      retry : Int64? = nil
+      retry : Int64? = nil,
     ) : Nil
       send Message.new(data, event, id, retry)
     end
@@ -54,7 +54,7 @@ module Radbas::ServerSentEvents
     def start : Nil
       @idle_time = 0
       until closed?
-        sleep 1
+        sleep 1.second
         if (@idle_time += 1) >= 60 * 30 # 30 minutes timeout
           close
           @on_close.try &.call

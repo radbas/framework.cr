@@ -3,7 +3,7 @@ class Radbas::Application
   include HttpHandler
 
   def initialize(
-    @logger = Log.for("radbas.app")
+    @logger = Log.for("radbas.app"),
   )
     @router = Routing::Router(Route).new
 

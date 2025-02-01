@@ -5,7 +5,7 @@ struct Radbas::MiddlewareDispatcher
 
   def initialize(
     middleware : Iterable(MiddlewareLike),
-    @delegate : Proc(Context, Nil)? = nil
+    @delegate : Proc(Context, Nil)? = nil,
   )
     @middleware = middleware.each
   end

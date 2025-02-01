@@ -2,7 +2,7 @@ class Radbas::RequestLoggerMiddleware
   include Middleware
 
   def initialize(
-    @logger = Log.for("radbas.server")
+    @logger = Log.for("radbas.server"),
   )
   end
 
