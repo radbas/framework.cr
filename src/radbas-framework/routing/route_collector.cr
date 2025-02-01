@@ -1,22 +1,16 @@
-class Radbas::RouteCollector
-  def initialize(@router : Routing::Router(Route))
-    @middleware = [] of MiddlewareLike
-    @path = ""
-  end
-
-  def set_validator(name : Symbol, validator : Validator) : self
-    @router.set_validator(name, validator)
-    self
-  end
+module Radbas::RouteCollector
+  @router : Routing::Router(Route)
+  @route_middleware = [] of MiddlewareLike
+  @route_path = ""
 
   def group(path : String = "", middleware = [] of MiddlewareLike, &) : self
-    current_path = @path
+    current_path = @route_path
     current_middleware = @middleware
-    @path = "#{@path}#{path}"
-    @middleware = [*@middleware, *middleware]
+    @route_path = "#{@route_path}#{path}"
+    @route_middleware = [*@route_middleware, *middleware]
     with self yield self
-    @path = current_path
-    @middleware = current_middleware
+    @route_path = current_path
+    @route_middleware = current_middleware
     self
   end
 
@@ -24,12 +18,12 @@ class Radbas::RouteCollector
     method : String,
     path : String,
     action : ActionLike,
-    middleware : Array(MiddlewareLike),
+    middleware : Indexable(MiddlewareLike),
     name : Symbol?,
   ) : self
-    route_middleware = [*@middleware, *middleware]
-    route = Route.new(action, route_middleware)
-    @router.map([method], "#{@path}#{path}", route, name)
+    route_middleware = [*@route_middleware, *middleware]
+    route = Route.new(route_middleware, action)
+    @router.map([method], "#{@route_path}#{path}", route, name)
     self
   end
 
