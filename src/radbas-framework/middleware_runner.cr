@@ -1,8 +1,8 @@
 module Radbas::MiddlewareRunner
   include Action
 
-  @middleware : Indexable(MiddlewareLike)
-  @endpoint : ActionLike
+  @middleware : Array(MiddlewareLike)
+  @action : ActionLike
 
   def call(context : Context) : Nil
     run(context, 0)
@@ -13,6 +13,6 @@ module Radbas::MiddlewareRunner
       next_handler = ->(ctx : Context) { run(ctx, position + 1) }
       return candidate.call(context, next_handler)
     end
-    @endpoint.call(context)
+    @action.call(context)
   end
 end

@@ -1,7 +1,7 @@
 class Radbas::RoutingMiddleware
   include Middleware
 
-  def initialize(@router : Routing::Router(Route))
+  def initialize(@router : Routing::Router(RouteEndpoint))
   end
 
   def call(context : Context, delegate : ActionLike) : Nil
@@ -19,7 +19,7 @@ class Radbas::RoutingMiddleware
       end
       raise HttpNotFoundException.new(context)
     end
-    context.route = match_result.handler.as(Route)
+    context.route = match_result.handler.as(RouteEndpoint)
     context.params = match_result.params
     delegate.call(context)
   end

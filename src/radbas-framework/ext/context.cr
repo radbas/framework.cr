@@ -2,7 +2,7 @@
 class HTTP::Server::Context
   @store = {} of String => JSON::Any::Type
 
-  property route : Radbas::Route?
+  property route : Radbas::RouteEndpoint?
   property params = {} of String => String
   property files = {} of String => File
   property body : (URI::Params | JSON::Any)?

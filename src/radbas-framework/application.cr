@@ -1,19 +1,44 @@
-class Radbas::Application
+class Radbas::Application < Radbas::RouteCollector
   include HTTP::Handler
   include MiddlewareRunner
-  include RouteCollector
+  include Action
 
   def initialize(
-    @middleware : Indexable(MiddlewareLike),
-    @router : Routing::Router(Route),
-    @logger : Log,
+    @router = Routing::Router(RouteEndpoint).new,
+    @logger = Log.for("radbas.app"),
   )
-    @endpoint = ->call_next(Context)
+    @middleware = [] of MiddlewareLike
+    @action = ->call_next(Context)
   end
 
   private getter server : HTTP::Server {
     HTTP::Server.new([HttpHeadHandler.new, self])
   }
+
+  def add_logging_middleware : LoggingMiddleware
+    logging_middleware = LoggingMiddleware.new(@logger)
+    add logging_middleware
+    logging_middleware
+  end
+
+  def add_error_middleware(show_details = false) : ErrorMiddleware
+    error_handler = CommonErrorHandler.new(show_details, @logger)
+    error_middleware = ErrorMiddleware.new(error_handler)
+    add error_middleware
+    error_middleware
+  end
+
+  def add_routing_middleware : RoutingMiddleware
+    routing_middleware = RoutingMiddleware.new(@router)
+    add routing_middleware
+    routing_middleware
+  end
+
+  def add_endpoint_middleware : EndpointMiddleware
+    endpoint_middleware = EndpointMiddleware.new
+    add endpoint_middleware
+    endpoint_middleware
+  end
 
   def bind(uri : String) : self
     server.bind(uri)
