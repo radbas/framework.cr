@@ -6,10 +6,10 @@ class Radbas::ApplicationBuilder < Radbas::RouteCollector
     @middleware = [] of MiddlewareLike
   end
 
-  def add_logging_middleware : LoggingMiddleware
-    logging_middleware = LoggingMiddleware.new(@logger)
-    add logging_middleware
-    logging_middleware
+  def add_request_logger_middleware : RequestLoggerMiddleware
+    logger_middleware = RequestLoggerMiddleware.new(@logger)
+    add logger_middleware
+    logger_middleware
   end
 
   def add_error_middleware(show_details = false) : ErrorMiddleware

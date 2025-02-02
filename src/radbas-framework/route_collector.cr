@@ -8,7 +8,7 @@ class Radbas::RouteCollector
   )
   end
 
-  def group(path : String, &) : self
+  def group(path : String = "", &) : self
     # important - only use current middleware, if route path is given
     middleware = @route_path ? [*@middleware] : [] of MiddlewareLike
     collector = RouteCollector.new(@router, middleware, "#{@route_path}#{path}")

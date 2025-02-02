@@ -3,7 +3,7 @@ require "json"
 require "radbas-routing"
 
 module Radbas
-  VERSION = "0.3.0"
+  VERSION = "0.3.1"
 
   alias Request = ::HTTP::Request
   alias Response = ::HTTP::Server::Response
@@ -39,7 +39,7 @@ require "./radbas-framework/ext/context"
 require "./radbas-framework/exceptions/http_exception"
 require "./radbas-framework/exceptions/*"
 require "./radbas-framework/middleware_runner"
-require "./radbas-framework/middleware/logging_middleware"
+require "./radbas-framework/middleware/request_logger_middleware"
 require "./radbas-framework/middleware/error_middleware"
 require "./radbas-framework/middleware/routing_middleware"
 require "./radbas-framework/middleware/endpoint_middleware"

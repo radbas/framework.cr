@@ -43,7 +43,7 @@ server = HTTP::Server.new([app])
 builder = Radbas::ApplicationBuilder.new
 
 # Built-in middleware
-builder.add_logging_middleware
+builder.add_request_logger_middleware
 builder.add_error_middleware # Gets added automatically, if not manually called
 builder.add_routing_middleware # Gets added automatically, if not manually called
 
