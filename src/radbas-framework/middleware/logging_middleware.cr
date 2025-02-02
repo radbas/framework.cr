@@ -6,7 +6,7 @@ class Radbas::LoggingMiddleware
   )
   end
 
-  def call(context : Context, delegate : ActionLike) : Nil
+  def call(context : Context, delegate : Next) : Nil
     delegate.call(context)
   ensure
     request = context.request

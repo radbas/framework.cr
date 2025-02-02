@@ -4,7 +4,7 @@ class Radbas::ErrorMiddleware
   def initialize(@error_handler : ErrorHandler)
   end
 
-  def call(context : Context, delegate : ActionLike) : Nil
+  def call(context : Context, delegate : Next) : Nil
     delegate.call(context)
   rescue exception
     @error_handler.handle(exception, context)

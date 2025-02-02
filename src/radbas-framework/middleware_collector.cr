@@ -2,7 +2,7 @@ module Radbas::MiddlewareCollector
   @middleware : Array(MiddlewareLike)
 
   def add(http_handler : HTTP::Handler) : self
-    use ->(ctx : Context, delegate : ActionLike) do
+    use ->(ctx : Context, delegate : Next) do
       http_handler.next = delegate
       http_handler.call(ctx)
     end

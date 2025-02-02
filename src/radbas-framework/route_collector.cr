@@ -2,7 +2,7 @@ class Radbas::RouteCollector
   include MiddlewareCollector
 
   def initialize(
-    @router : Routing::Router(RouteEndpoint),
+    @router : Routing::Router(Action),
     @middleware : Array(MiddlewareLike),
     @route_path : String | Nil,
   )
@@ -24,7 +24,7 @@ class Radbas::RouteCollector
   ) : self
     # important - only use current middleware, if route path is given
     middleware = @route_path ? [*@middleware] : [] of MiddlewareLike
-    endpoint = RouteEndpoint.new(action, middleware)
+    endpoint = Application.new(middleware, action)
     @router.map([method], "#{@route_path}#{path}", endpoint, name)
     self
   end

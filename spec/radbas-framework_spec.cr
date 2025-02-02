@@ -10,7 +10,6 @@ describe Radbas do
       ctx = HTTP::Server::Context.new request, response
       app.call ctx
       response.status_code.should eq 404
-      # output.to_s.should eq ""
     end
   end
 end
