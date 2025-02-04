@@ -2,12 +2,12 @@ class Radbas::CommonErrorHandler
   include ErrorHandler
 
   def initialize(
-    @show_details = false,
     @logger = Log.for("radbas.app"),
+    @show_details = false,
   )
   end
 
-  def handle(exception : Exception, context : Context) : Nil
+  def call(context : Context, exception : Exception) : Nil
     response = context.response
 
     status_code : Int32 = HTTP::Status::INTERNAL_SERVER_ERROR.code

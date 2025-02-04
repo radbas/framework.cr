@@ -26,7 +26,8 @@ class Radbas::ApplicationServer
       @logger.warn { "no socket bound, using default #{bind}" }
     end
     server.each_address do |address|
-      @logger.info { "server listening on #{address}" }
+      protocol = address.family.unix? ? "unix" : "http"
+      @logger.info { "server listening on #{protocol}://#{address}" }
     end
     Signal::INT.trap &->shutdown(Signal)
     Signal::TERM.trap &->shutdown(Signal)

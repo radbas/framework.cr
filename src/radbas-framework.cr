@@ -13,6 +13,7 @@ module Radbas
   alias MiddlewareLike = ::Proc(Context, Next, Nil) | Middleware
   alias SocketHandlerLike = ::Proc(::HTTP::WebSocket, Context, Nil) | SocketHandler
   alias StreamHandlerLike = ::Proc(ServerSentEvents::Stream, Context, Nil) | StreamHandler
+  alias ErrorHandlerLike = ::Proc(Context, Exception, Nil) | ErrorHandler
 
   module Middleware
     abstract def call(context : Context, delegate : Next)
@@ -31,7 +32,7 @@ module Radbas
   end
 
   module ErrorHandler
-    abstract def handle(exception : Exception, context : Context)
+    abstract def call(context : Context, exception : Exception)
   end
 end
 
@@ -40,7 +41,7 @@ require "./radbas-framework/exceptions/http_exception"
 require "./radbas-framework/exceptions/*"
 require "./radbas-framework/middleware_runner"
 require "./radbas-framework/middleware/request_logger_middleware"
-require "./radbas-framework/middleware/error_middleware"
+require "./radbas-framework/middleware/error_handler_middleware"
 require "./radbas-framework/middleware/routing_middleware"
 require "./radbas-framework/middleware/endpoint_middleware"
 require "./radbas-framework/middleware_collector"

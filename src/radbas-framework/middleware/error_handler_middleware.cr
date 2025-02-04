@@ -1,12 +1,12 @@
-class Radbas::ErrorMiddleware
+class Radbas::ErrorHandlerMiddleware
   include Middleware
 
-  def initialize(@error_handler : ErrorHandler)
+  def initialize(@error_handler : ErrorHandlerLike)
   end
 
   def call(context : Context, delegate : Next) : Nil
     delegate.call(context)
   rescue exception
-    @error_handler.handle(exception, context)
+    @error_handler.call(context, exception)
   end
 end
