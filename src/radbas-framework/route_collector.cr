@@ -16,7 +16,7 @@ class Radbas::RouteCollector
     self
   end
 
-  private def map(
+  def map(
     method : String,
     path : String,
     action : ActionLike,
