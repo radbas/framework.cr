@@ -26,6 +26,7 @@ class Radbas::CommonErrorHandler
       details: @show_details ? exception.inspect_with_backtrace.strip.split("\n").map &.strip : nil,
     }
 
+    response.reset
     response.status_code = status_code
     response.content_type = "application/json"
     payload.to_json(response.output)

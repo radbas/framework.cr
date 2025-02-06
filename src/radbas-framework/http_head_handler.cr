@@ -34,7 +34,7 @@ class Radbas::HttpHeadHandler
   end
 
   def call(context)
-    if context.request.method == "HEAD"
+    if context.request.ignore_body?
       context.response.output = VoidOutput.new(context.response)
     end
     call_next(context)

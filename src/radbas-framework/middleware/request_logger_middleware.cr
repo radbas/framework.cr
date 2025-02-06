@@ -21,9 +21,8 @@ class Radbas::RequestLoggerMiddleware
         remote_address
       end
     request_line = "\"#{request.method} #{request.resource} #{request.version}\""
-    datetime = Time::Format::ISO_8601_DATE_TIME.format(Time.local)
     @logger.info {
-      "#{address} - [#{datetime}] #{request_line} #{response.status_code}"
+      "#{address} - #{request_line} #{response.status_code}"
     }
   end
 end

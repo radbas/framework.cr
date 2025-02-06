@@ -5,13 +5,14 @@ class Radbas::RoutingMiddleware
   end
 
   def call(context : Context, delegate : Next) : Nil
-    request_method = context.request.method
+    request = context.request
+    request_method = request.method
     if request_method == "HEAD"
       request_method = "GET"
-    elsif request_method == "GET" && websocket_upgrade_request?(context.request)
+    elsif request_method == "GET" && websocket_upgrade_request?(request)
       request_method = "WS"
     end
-    result = @router.match(request_method, context.request.path)
+    result = @router.match(request_method, request.path)
     context.params = result.params
     context.route = result
     delegate.call(context)

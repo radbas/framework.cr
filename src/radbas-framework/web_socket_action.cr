@@ -1,21 +1,22 @@
 class Radbas::WebSocketAction
-  include Action
   private alias WebSocket = HTTP::WebSocket
+  include Action
 
   def initialize(@socket_handler : SocketHandlerLike)
   end
 
   def call(context : Context) : Nil
+    request = context.request
     response = context.response
 
-    version = context.request.headers["Sec-WebSocket-Version"]?
+    version = request.headers["Sec-WebSocket-Version"]?
     unless version == WebSocket::Protocol::VERSION
       response.status = :upgrade_required
       response.headers["Sec-WebSocket-Version"] = WebSocket::Protocol::VERSION
       return
     end
 
-    unless key = context.request.headers["Sec-WebSocket-Key"]?
+    unless key = request.headers["Sec-WebSocket-Key"]?
       raise HttpBadRequestException.new(context, "missing socket key")
     end
 

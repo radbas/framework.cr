@@ -15,7 +15,7 @@ class Radbas::PerformanceMiddleware
       elapsed = Time.monotonic - start_time
       bytes = GC.stats.total_bytes - start_bytes
       @logger.info {
-        "Time: #{elapsed.total_milliseconds.round(2)} ms | Memory: #{bytes.round(2)} bytes"
+        "time: #{elapsed.total_milliseconds.round(2)} ms | memory: #{(bytes / 1024 / 1024).round(2)} mb"
       }
     end
   end

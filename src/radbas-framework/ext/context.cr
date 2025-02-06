@@ -7,10 +7,6 @@ class HTTP::Server::Context
   property files = {} of String => File
   property body : (URI::Params | JSON::Any)?
 
-  getter query : URI::Params {
-    URI::Params.parse(@request.query || "")
-  }
-
   def []=(key, value)
     @store[key] = value
   end
